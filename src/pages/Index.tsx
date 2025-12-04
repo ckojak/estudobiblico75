@@ -33,6 +33,7 @@ export default function Index() {
 
   const antigoTestamento = biblicalBooks.filter((b) => b.testament === "antigo");
   const novoTestamento = biblicalBooks.filter((b) => b.testament === "novo");
+  const estudos = biblicalBooks.filter((b) => b.testament === "estudo");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -51,13 +52,13 @@ export default function Index() {
               </Badge>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-6 animate-fade-in">
-                Todos os Livros da Bíblia em{" "}
-                <span className="text-primary">E-book</span>
+                E-books Bíblicos de{" "}
+                <span className="text-primary">Alta Qualidade</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                66 livros sagrados disponíveis para download imediato. 
-                Fortaleça sua fé com a Palavra de Deus em formato digital.
+                {biblicalBooks.length} materiais disponíveis para download imediato. 
+                Fortaleça sua fé com estudos profundos da Palavra de Deus.
               </p>
 
               <div className="flex flex-wrap justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -76,7 +77,7 @@ export default function Index() {
               </div>
 
               <div className="inline-flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-6 py-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-                <span className="text-sm text-muted-foreground">Qualquer livro por apenas</span>
+                <span className="text-sm text-muted-foreground">Qualquer e-book por apenas</span>
                 <span className="text-3xl font-bold text-accent">R$ 5,00</span>
                 <span className="text-xs text-muted-foreground">+ R$ 0,50 taxa</span>
               </div>
@@ -88,15 +89,18 @@ export default function Index() {
         <section className="container py-12">
           <Tabs defaultValue="todos" className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="grid grid-cols-3 w-full max-w-md">
+              <TabsList className="grid grid-cols-4 w-full max-w-lg">
                 <TabsTrigger value="todos">
                   Todos ({biblicalBooks.length})
                 </TabsTrigger>
                 <TabsTrigger value="antigo">
-                  Antigo ({antigoTestamento.length})
+                  AT ({antigoTestamento.length})
                 </TabsTrigger>
                 <TabsTrigger value="novo">
-                  Novo ({novoTestamento.length})
+                  NT ({novoTestamento.length})
+                </TabsTrigger>
+                <TabsTrigger value="estudos">
+                  Estudos ({estudos.length})
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -138,6 +142,23 @@ export default function Index() {
             <TabsContent value="novo">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {novoTestamento.map((book, index) => (
+                  <div
+                    key={book.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 0.02}s` }}
+                  >
+                    <BookCard
+                      book={book}
+                      isPurchased={purchasedBooks.includes(book.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="estudos">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {estudos.map((book, index) => (
                   <div
                     key={book.id}
                     className="animate-fade-in"
