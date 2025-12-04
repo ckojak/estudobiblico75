@@ -5,11 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-react";
+import { Loader2, DollarSign, ShoppingCart, TrendingUp, Users, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { biblicalBooks } from "@/data/biblicalBooks";
 import { AdminBookManager } from "@/components/AdminBookManager";
+import { AdminPixReceipts } from "@/components/AdminPixReceipts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PurchaseData {
@@ -193,11 +194,19 @@ export default function Admin() {
           </p>
         </div>
 
-        <Tabs defaultValue="analytics" className="space-y-6">
+        <Tabs defaultValue="pix" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="pix" className="flex items-center gap-2">
+              <Receipt className="w-4 h-4" />
+              Comprovantes PIX
+            </TabsTrigger>
             <TabsTrigger value="analytics">Análises</TabsTrigger>
             <TabsTrigger value="books">Gerenciar Livros</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="pix">
+            <AdminPixReceipts />
+          </TabsContent>
 
           <TabsContent value="books">
             <AdminBookManager />
