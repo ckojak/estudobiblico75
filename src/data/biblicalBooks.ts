@@ -11,8 +11,10 @@ export interface BibleBook {
 }
 
 export const biblicalBooks: BibleBook[] = [
-  // Destaque - Mais Vendido
+  // Destaques - Mais Vendidos
   { id: "apocalipse", title: "Estudo de Apocalipse", slug: "apocalipse", testament: "novo", originalPrice: 14.90, salePrice: 5.00, description: "Revelações do fim dos tempos e a vitória final de Cristo.", coverImage: "/covers/apocalipse.jpg", isBestSeller: true },
+  { id: "atos-dos-apostolos", title: "Atos dos Apóstolos", slug: "atos-dos-apostolos", testament: "novo", originalPrice: 14.90, salePrice: 5.00, description: "A história da igreja primitiva e a expansão do evangelho.", coverImage: "/covers/atos-dos-apostolos.jpg", isBestSeller: true },
+  { id: "jo", title: "Jó", slug: "jo", testament: "antigo", originalPrice: 12.90, salePrice: 5.00, description: "Sofrimento, fé e a soberania de Deus.", coverImage: "/covers/jo.jpg", isBestSeller: true },
 
   // Antigo Testamento
   { id: "genesis", title: "Gênesis", slug: "genesis", testament: "antigo", originalPrice: 12.90, salePrice: 5.00, description: "O livro das origens - criação, patriarcas e promessas divinas.", coverImage: "/covers/genesis.jpg" },
