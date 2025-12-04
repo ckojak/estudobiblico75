@@ -1,11 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const createPaymentSchema = z.object({
+  bookId: z.string().uuid("Invalid book ID format"),
+  bookTitle: z.string().min(1, "Book title is required").max(200, "Book title too long"),
+});
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -25,8 +32,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
     
-    const { bookId, bookTitle, amount } = await req.json();
-    logStep("Request payload", { bookId, bookTitle, amount });
+    // Parse and validate input
+    const body = await req.json();
+    const parseResult = createPaymentSchema.safeParse(body);
+    
+    if (!parseResult.success) {
+      const errorMessage = parseResult.error.errors.map(e => e.message).join(", ");
+      logStep("Validation failed", { errors: errorMessage });
+      return new Response(JSON.stringify({ error: `Invalid input: ${errorMessage}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    const { bookId, bookTitle } = parseResult.data;
+    logStep("Input validated", { bookId, bookTitle });
 
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
@@ -37,6 +57,29 @@ serve(async (req) => {
       throw new Error("User not authenticated or email not available");
     }
     logStep("User authenticated", { userId: user.id, email: user.email });
+
+    // Fetch book price from database (prevents price manipulation)
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    
+    const { data: book, error: bookError } = await supabaseAdmin
+      .from("books")
+      .select("sale_price, title")
+      .eq("id", bookId)
+      .single();
+    
+    if (bookError || !book) {
+      logStep("Book not found", { bookId, error: bookError });
+      return new Response(JSON.stringify({ error: "Book not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+    
+    const amount = book.sale_price;
+    logStep("Book price fetched from database", { bookId, amount });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -62,8 +105,8 @@ serve(async (req) => {
           price_data: {
             currency: "brl",
             product_data: {
-              name: bookTitle,
-              description: `E-book Bíblico - ${bookTitle}`,
+              name: book.title || bookTitle,
+              description: `E-book Bíblico - ${book.title || bookTitle}`,
             },
             unit_amount: totalAmount,
           },

@@ -1,11 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const verifyPaymentSchema = z.object({
+  sessionId: z.string().min(1, "Session ID is required").regex(/^cs_/, "Invalid Stripe session ID format"),
+  bookId: z.string().uuid("Invalid book ID format"),
+});
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -25,8 +32,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { sessionId, bookId } = await req.json();
-    logStep("Request payload", { sessionId, bookId });
+    // Parse and validate input
+    const body = await req.json();
+    const parseResult = verifyPaymentSchema.safeParse(body);
+    
+    if (!parseResult.success) {
+      const errorMessage = parseResult.error.errors.map(e => e.message).join(", ");
+      logStep("Validation failed", { errors: errorMessage });
+      return new Response(JSON.stringify({ error: `Invalid input: ${errorMessage}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    const { sessionId, bookId } = parseResult.data;
+    logStep("Input validated", { sessionId, bookId });
 
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
@@ -44,6 +64,21 @@ serve(async (req) => {
     }
     logStep("User authenticated", { userId: user.id });
 
+    // Verify book exists
+    const { data: book, error: bookError } = await supabaseClient
+      .from("books")
+      .select("id, sale_price")
+      .eq("id", bookId)
+      .single();
+    
+    if (bookError || !book) {
+      logStep("Book not found", { bookId, error: bookError });
+      return new Response(JSON.stringify({ error: "Book not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
@@ -53,6 +88,12 @@ serve(async (req) => {
 
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
+    }
+
+    // Verify session metadata matches the bookId
+    if (session.metadata?.bookId !== bookId) {
+      logStep("Book ID mismatch", { sessionBookId: session.metadata?.bookId, requestBookId: bookId });
+      throw new Error("Payment session does not match the requested book");
     }
 
     // Check if purchase already exists
