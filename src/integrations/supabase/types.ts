@@ -84,6 +84,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          pix_receipt_url: string | null
           service_fee: number
           status: string
           stripe_payment_intent_id: string | null
@@ -95,6 +96,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          pix_receipt_url?: string | null
           service_fee?: number
           status?: string
           stripe_payment_intent_id?: string | null
@@ -106,6 +108,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          pix_receipt_url?: string | null
           service_fee?: number
           status?: string
           stripe_payment_intent_id?: string | null

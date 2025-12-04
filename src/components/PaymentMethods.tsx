@@ -1,12 +1,14 @@
-import { Shield, Lock, Copy, Check } from "lucide-react";
+import { Shield, Lock, Copy, Check, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import pixQrCode from "@/assets/pix-qrcode.jpeg";
+import PixReceiptUpload from "./PixReceiptUpload";
 
 const PIX_CODE = "00020126580014BR.GOV.BCB.PIX01368b362a40-2c30-4453-921c-d318db20116852040000530398654045.935802BR5924Carlos Henrique da Costa6009SAO PAULO62140510zdxnN49Kap6304A896";
 
 const PaymentMethods = () => {
   const [copied, setCopied] = useState(false);
+  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
   const handleCopyPix = async () => {
     try {
@@ -84,9 +86,18 @@ const PaymentMethods = () => {
                     )}
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Após o pagamento, envie o comprovante para confirmar sua compra.
-                </p>
+                <div className="mt-4 pt-4 border-t border-border/30">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Após o pagamento, envie o comprovante para confirmar sua compra:
+                  </p>
+                  <button
+                    onClick={() => setShowReceiptUpload(true)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg font-medium transition-colors duration-200"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Enviar Comprovante
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -192,6 +203,11 @@ const PaymentMethods = () => {
           </div>
         </div>
       </div>
+
+      <PixReceiptUpload 
+        open={showReceiptUpload} 
+        onOpenChange={setShowReceiptUpload}
+      />
     </section>
   );
 };
