@@ -122,6 +122,11 @@ serve(async (req) => {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       payment_method_types: ['card', 'pix'],
+      payment_method_options: {
+        card: {
+          setup_future_usage: 'off_session',
+        },
+      },
       line_items: [
         {
           price_data: {

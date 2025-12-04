@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BookCard } from "@/components/BookCard";
+import PaymentMethods from "@/components/PaymentMethods";
 import { biblicalBooks } from "@/data/biblicalBooks";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -221,6 +222,7 @@ export default function Index() {
         </section>
       </main>
 
+      <PaymentMethods />
       <Footer />
     </div>
   );
