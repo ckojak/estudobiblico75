@@ -106,10 +106,10 @@ export default function Index() {
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-2xl px-6 py-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <div className="inline-flex items-center gap-3 bg-teal-500/10 border border-teal-500/20 rounded-2xl px-6 py-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
                 <span className="text-sm text-muted-foreground">Qualquer e-book por apenas</span>
-                <span className="text-3xl font-bold text-accent">R$ 5,00</span>
-                <span className="text-xs text-muted-foreground">+ R$ 0,93 taxa</span>
+                <span className="text-3xl font-bold text-teal-600">R$ 5,00</span>
+                <span className="text-xs text-muted-foreground">via PIX</span>
               </div>
             </div>
           </div>
