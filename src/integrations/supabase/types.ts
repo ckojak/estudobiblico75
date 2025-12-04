@@ -14,7 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      books: {
+        Row: {
+          book_order: number | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          original_price: number
+          pdf_file_path: string | null
+          sale_price: number
+          slug: string
+          testament: string | null
+          title: string
+        }
+        Insert: {
+          book_order?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          original_price?: number
+          pdf_file_path?: string | null
+          sale_price?: number
+          slug: string
+          testament?: string | null
+          title: string
+        }
+        Update: {
+          book_order?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          original_price?: number
+          pdf_file_path?: string | null
+          sale_price?: number
+          slug?: string
+          testament?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount_paid: number
+          book_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          service_fee: number
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          book_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          service_fee?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          book_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          service_fee?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
