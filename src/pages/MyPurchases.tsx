@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Download, ShoppingBag, ArrowLeft, Loader2 } from "lucide-react";
-import { biblicalBooks } from "@/data/biblicalBooks";
 import { useToast } from "@/hooks/use-toast";
 
 interface Purchase {
@@ -17,6 +16,15 @@ interface Purchase {
   amount_paid: number;
   created_at: string;
   status: string;
+  books: {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    testament: string | null;
+    cover_image_url: string | null;
+    pdf_file_path: string | null;
+  } | null;
 }
 
 export default function MyPurchases() {
@@ -38,7 +46,18 @@ export default function MyPurchases() {
   const loadPurchases = async () => {
     const { data, error } = await supabase
       .from("purchases")
-      .select("*")
+      .select(`
+        *,
+        books (
+          id,
+          title,
+          slug,
+          description,
+          testament,
+          cover_image_url,
+          pdf_file_path
+        )
+      `)
       .eq("user_id", user?.id)
       .eq("status", "completed")
       .order("created_at", { ascending: false });
@@ -54,6 +73,15 @@ export default function MyPurchases() {
       setPurchases(data || []);
     }
     setLoading(false);
+  };
+
+  const getTestamentLabel = (testament: string | null) => {
+    switch (testament) {
+      case "antigo": return "AT";
+      case "novo": return "NT";
+      case "estudo": return "Estudo";
+      default: return testament || "-";
+    }
   };
 
   const handleDownload = async (bookId: string, bookTitle: string) => {
@@ -154,15 +182,25 @@ export default function MyPurchases() {
           ) : (
             <div className="grid gap-4">
               {purchases.map((purchase) => {
-                const book = biblicalBooks.find((b) => b.id === purchase.book_id);
+                const book = purchase.books;
                 if (!book) return null;
 
                 return (
                   <Card key={purchase.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-8 h-8 text-primary" />
+                        <div className="w-16 h-20 rounded-lg flex-shrink-0 overflow-hidden">
+                          {book.cover_image_url ? (
+                            <img 
+                              src={book.cover_image_url} 
+                              alt={book.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                              <BookOpen className="w-8 h-8 text-primary" />
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex-1 min-w-0">
@@ -171,7 +209,7 @@ export default function MyPurchases() {
                               {book.title}
                             </h3>
                             <Badge variant="secondary" className="text-xs">
-                              {book.testament === "antigo" ? "AT" : "NT"}
+                              {getTestamentLabel(book.testament)}
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
@@ -185,14 +223,15 @@ export default function MyPurchases() {
                         <Button 
                           onClick={() => handleDownload(book.id, book.title)}
                           className="flex-shrink-0"
-                          disabled={downloadingBook === book.id}
+                          disabled={downloadingBook === book.id || !book.pdf_file_path}
+                          title={!book.pdf_file_path ? "PDF ainda não disponível" : "Baixar PDF"}
                         >
                           {downloadingBook === book.id ? (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           ) : (
                             <Download className="w-4 h-4 mr-2" />
                           )}
-                          {downloadingBook === book.id ? "Baixando..." : "Baixar PDF"}
+                          {downloadingBook === book.id ? "Baixando..." : book.pdf_file_path ? "Baixar PDF" : "Em breve"}
                         </Button>
                       </div>
                     </CardContent>
