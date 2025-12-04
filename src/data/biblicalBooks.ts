@@ -40,4 +40,5 @@ export const biblicalBooks: BibleBook[] = [
   { id: "ministerio-jesus", title: "O Ministério de Jesus", slug: "ministerio-jesus", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "Explore a vida e o ministério terreno de Jesus Cristo.", coverImage: "/covers/ministerio-jesus.jpg" },
   { id: "biografia-paulo", title: "Biografia de Paulo", slug: "biografia-paulo", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "A fascinante jornada do apóstolo Paulo.", coverImage: "/covers/biografia-paulo.jpg" },
   { id: "oracao-pai-nosso", title: "A Oração do Pai Nosso", slug: "oracao-pai-nosso", testament: "estudo", originalPrice: 12.90, salePrice: 5.00, description: "Um estudo teológico profundo sobre a oração modelo.", coverImage: "/covers/oracao-pai-nosso.jpg" },
+  { id: "devocional-365-dias", title: "Devocional 365 Dias", slug: "devocional-365-dias", testament: "estudo", originalPrice: 19.90, salePrice: 5.00, description: "Um ano inteiro de reflexões diárias para fortalecer sua fé.", coverImage: "/covers/devocional-365-dias.jpg" },
 ];

@@ -9,6 +9,8 @@ import { Loader2, DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { biblicalBooks } from "@/data/biblicalBooks";
+import { AdminBookManager } from "@/components/AdminBookManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PurchaseData {
   id: string;
@@ -187,9 +189,21 @@ export default function Admin() {
             Painel Administrativo
           </h1>
           <p className="text-muted-foreground">
-            Visão geral de vendas e métricas
+            Gerencie livros, vendas e métricas
           </p>
         </div>
+
+        <Tabs defaultValue="analytics" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="analytics">Análises</TabsTrigger>
+            <TabsTrigger value="books">Gerenciar Livros</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="books">
+            <AdminBookManager />
+          </TabsContent>
+
+          <TabsContent value="analytics">
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -466,6 +480,8 @@ export default function Admin() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </main>
 
       <Footer />
