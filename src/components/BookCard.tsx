@@ -108,7 +108,7 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
           </div>
 
           <p className="text-xs text-muted-foreground mb-4">
-            + R$ 0,50 taxa de serviço
+            + R$ 0,93 taxa de serviço
           </p>
 
           {isPurchased ? (

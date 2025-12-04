@@ -114,9 +114,9 @@ serve(async (req) => {
       logStep("Found existing customer", { customerId });
     }
 
-    // Total amount including service fee (R$ 0.50)
-    const totalAmount = Math.round((amount + 0.50) * 100); // Convert to cents
-    logStep("Calculated total", { baseAmount: amount, serviceFee: 0.50, totalCents: totalAmount });
+    // Total amount including service fee (R$ 0.93)
+    const totalAmount = Math.round((amount + 0.93) * 100); // Convert to cents
+    logStep("Calculated total", { baseAmount: amount, serviceFee: 0.93, totalCents: totalAmount });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
