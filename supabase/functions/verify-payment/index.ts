@@ -96,17 +96,17 @@ serve(async (req) => {
       throw new Error("Payment session does not match the requested book");
     }
 
-    // Check if purchase already exists
+    const paymentIntentId = session.payment_intent as string;
+    
+    // Check if purchase already exists for this payment intent (prevents duplicates)
     const { data: existingPurchase } = await supabaseClient
       .from("purchases")
       .select("id")
-      .eq("user_id", user.id)
-      .eq("book_id", bookId)
-      .eq("status", "completed")
+      .eq("stripe_payment_intent_id", paymentIntentId)
       .maybeSingle();
 
     if (existingPurchase) {
-      logStep("Purchase already exists", { purchaseId: existingPurchase.id });
+      logStep("Purchase already exists for this payment", { purchaseId: existingPurchase.id, paymentIntentId });
       return new Response(JSON.stringify({ success: true, alreadyPurchased: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -119,7 +119,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         book_id: bookId,
-        stripe_payment_intent_id: session.payment_intent as string,
+        stripe_payment_intent_id: paymentIntentId,
         amount_paid: (session.amount_total || 0) / 100,
         service_fee: 0.50,
         status: "completed",
