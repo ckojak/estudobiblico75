@@ -69,12 +69,38 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id });
 
-    // Verify purchase using service role key
+    // Use service role key for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // First, get the book info to find the correct file path
+    const { data: book, error: bookError } = await supabaseAdmin
+      .from("books")
+      .select("id, slug, pdf_file_path, title")
+      .eq("id", bookId)
+      .maybeSingle();
+
+    if (bookError) {
+      logStep("Error fetching book", { error: bookError });
+      return new Response(JSON.stringify({ error: "Failed to fetch book info" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    if (!book) {
+      logStep("Book not found", { bookId });
+      return new Response(JSON.stringify({ error: "Book not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    logStep("Book found", { bookId: book.id, slug: book.slug, pdfPath: book.pdf_file_path });
+
+    // Verify purchase
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from("purchases")
       .select("id, status")
@@ -93,7 +119,7 @@ serve(async (req) => {
 
     if (!purchase) {
       logStep("Purchase not found", { userId: user.id, bookId });
-      return new Response(JSON.stringify({ error: "You haven't purchased this book" }), {
+      return new Response(JSON.stringify({ error: "Você não comprou este livro" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 403,
       });
@@ -101,8 +127,18 @@ serve(async (req) => {
 
     logStep("Purchase verified", { purchaseId: purchase.id });
 
-    // Generate signed URL for the PDF (expires in 5 minutes)
-    const filePath = `books/${bookId}.pdf`;
+    // Check if PDF file path exists
+    if (!book.pdf_file_path) {
+      logStep("PDF not available", { bookId, slug: book.slug });
+      return new Response(JSON.stringify({ error: "PDF ainda não disponível. Entre em contato com o suporte." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    // Use the stored pdf_file_path from the database (e.g., "books/apocalipse.pdf")
+    const filePath = book.pdf_file_path;
+    logStep("Using file path", { filePath });
     
     const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin
       .storage
@@ -111,7 +147,7 @@ serve(async (req) => {
 
     if (signedUrlError) {
       logStep("Error generating signed URL", { error: signedUrlError, filePath });
-      return new Response(JSON.stringify({ error: "PDF file not available. Please contact support." }), {
+      return new Response(JSON.stringify({ error: "Arquivo PDF não encontrado. Entre em contato com o suporte." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 404,
       });
