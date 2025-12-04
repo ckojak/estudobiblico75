@@ -14,9 +14,9 @@ const PaymentMethods = () => {
           Escolha a forma de pagamento que preferir
         </p>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Main Payment Methods Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
             {/* Credit Card */}
             <div className="group flex flex-col items-center gap-2 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
               <div className="w-14 h-9 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -37,17 +37,6 @@ const PaymentMethods = () => {
                 </svg>
               </div>
               <span className="text-xs font-medium text-foreground">Débito</span>
-            </div>
-
-            {/* PIX */}
-            <div className="group flex flex-col items-center gap-2 p-4 bg-card rounded-xl border border-border/50 hover:border-teal-500/30 hover:shadow-lg hover:shadow-teal-500/5 transition-all duration-300">
-              <div className="w-14 h-9 bg-gradient-to-br from-teal-500/10 to-teal-500/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-7 h-5" viewBox="0 0 512 512" fill="none">
-                  <path d="M112.57 391.19c20.056 0 38.928-7.808 53.12-22l76.693-76.692c5.385-5.404 14.765-5.384 20.15 0l76.989 76.989c14.191 14.172 33.045 21.98 53.12 21.98h15.098l-97.138 97.139c-30.326 30.344-79.505 30.344-109.85 0l-97.415-97.416h9.232zm280.068-271.294c-20.056 0-38.929 7.809-53.12 22l-76.97 76.99c-5.551 5.53-14.6 5.568-20.15-.02l-76.711-76.693c-14.192-14.191-33.046-21.999-53.12-21.999h-9.234l97.416-97.416c30.344-30.344 79.523-30.344 109.867 0l97.138 97.138h-15.116z" fill="#32BCAD"/>
-                  <path d="M112.57 119.896h38.297c7.97 0 15.98 3.027 22.022 9.088l76.711 76.693c14.21 14.21 37.279 14.192 51.489-.02l76.97-76.97c6.06-6.042 14.052-9.069 22.003-9.069h38.297L359.37 40.607c-30.326-30.326-79.505-30.326-109.849 0L112.57 119.896zm317.789 271.294h-38.278c-7.97 0-15.943-3.027-22.003-9.07l-76.989-76.988c-6.943-6.943-16.071-10.414-25.2-10.414-9.109 0-18.237 3.471-25.18 10.414l-76.693 76.692c-6.042 6.042-14.052 9.088-22.022 9.088h-38.297l136.97 136.97c30.344 30.326 79.523 30.326 109.849 0l78.843-136.692z" fill="#32BCAD"/>
-                </svg>
-              </div>
-              <span className="text-xs font-medium text-foreground">PIX</span>
             </div>
 
             {/* Google Pay */}
