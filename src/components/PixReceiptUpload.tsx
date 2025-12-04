@@ -140,7 +140,7 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
         setPreview(null);
         setSelectedFile(null);
         setSelectedBookId("");
-      }, 2500);
+      }, 4000);
 
     } catch (error: any) {
       console.error("Error uploading receipt:", error);
@@ -184,14 +184,22 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
 
         <div className="space-y-4">
           {uploaded ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="w-16 h-16 bg-teal-500/10 rounded-full flex items-center justify-center mb-4">
-                <Check className="w-8 h-8 text-teal-500" />
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6 animate-[scale-in_0.3s_ease-out]">
+                <Check className="w-10 h-10 text-white" strokeWidth={3} />
               </div>
-              <h4 className="font-medium text-foreground">Comprovante Enviado!</h4>
-              <p className="text-sm text-muted-foreground mt-1">
-                Você receberá acesso ao e-book após a aprovação.
+              <h4 className="text-xl font-bold text-green-600 mb-2">Enviado com Sucesso!</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Seu comprovante foi recebido e está aguardando aprovação.
               </p>
+              <div className="w-full p-4 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
+                <p className="text-sm text-green-700 dark:text-green-400 font-medium">
+                  📖 {selectedBook?.title || bookTitle}
+                </p>
+                <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+                  Você receberá acesso em "Minhas Compras" após a aprovação.
+                </p>
+              </div>
             </div>
           ) : (
             <>
