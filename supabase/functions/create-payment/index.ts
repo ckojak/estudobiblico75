@@ -10,7 +10,7 @@ const corsHeaders = {
 
 // Input validation schema
 const createPaymentSchema = z.object({
-  bookId: z.string().uuid("Invalid book ID format"),
+  bookId: z.string().min(1, "Book ID is required").max(100, "Book ID too long"),
   bookTitle: z.string().min(1, "Book title is required").max(200, "Book title too long"),
 });
 
@@ -59,16 +59,36 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Fetch book price from database (prevents price manipulation)
+    // Try to find by UUID first, then by slug
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
     
-    const { data: book, error: bookError } = await supabaseAdmin
-      .from("books")
-      .select("sale_price, title")
-      .eq("id", bookId)
-      .single();
+    // Check if bookId is a valid UUID
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookId);
+    
+    let book;
+    let bookError;
+    
+    if (isUUID) {
+      const result = await supabaseAdmin
+        .from("books")
+        .select("id, sale_price, title")
+        .eq("id", bookId)
+        .single();
+      book = result.data;
+      bookError = result.error;
+    } else {
+      // Try to find by slug
+      const result = await supabaseAdmin
+        .from("books")
+        .select("id, sale_price, title")
+        .eq("slug", bookId)
+        .single();
+      book = result.data;
+      bookError = result.error;
+    }
     
     if (bookError || !book) {
       logStep("Book not found", { bookId, error: bookError });
@@ -78,8 +98,9 @@ serve(async (req) => {
       });
     }
     
+    const actualBookId = book.id; // Use the UUID from database
     const amount = book.sale_price;
-    logStep("Book price fetched from database", { bookId, amount });
+    logStep("Book price fetched from database", { bookId: actualBookId, amount });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -114,10 +135,10 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/sucesso?session_id={CHECKOUT_SESSION_ID}&book_id=${bookId}`,
+      success_url: `${req.headers.get("origin")}/sucesso?session_id={CHECKOUT_SESSION_ID}&book_id=${actualBookId}`,
       cancel_url: `${req.headers.get("origin")}/`,
       metadata: {
-        bookId,
+        bookId: actualBookId,
         userId: user.id,
         serviceFee: "0.50",
       },
