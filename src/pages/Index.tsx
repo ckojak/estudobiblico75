@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Sparkles, Shield, Download } from "lucide-react";
+import { BookOpen, Sparkles, Shield, Download, Flame } from "lucide-react";
 
 export default function Index() {
   const { user } = useAuth();
@@ -31,9 +31,11 @@ export default function Index() {
     }
   };
 
-  const antigoTestamento = biblicalBooks.filter((b) => b.testament === "antigo");
-  const novoTestamento = biblicalBooks.filter((b) => b.testament === "novo");
-  const estudos = biblicalBooks.filter((b) => b.testament === "estudo");
+  const bestSeller = biblicalBooks.find((b) => b.isBestSeller);
+  const regularBooks = biblicalBooks.filter((b) => !b.isBestSeller);
+  const antigoTestamento = regularBooks.filter((b) => b.testament === "antigo");
+  const novoTestamento = regularBooks.filter((b) => b.testament === "novo");
+  const estudos = regularBooks.filter((b) => b.testament === "estudo");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -85,13 +87,29 @@ export default function Index() {
           </div>
         </section>
 
+        {/* Best Seller Highlight */}
+        {bestSeller && (
+          <section className="container py-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Flame className="w-6 h-6 text-orange-500" />
+              <h2 className="text-2xl font-serif font-bold text-foreground">Mais Vendido</h2>
+            </div>
+            <div className="max-w-sm mx-auto md:mx-0">
+              <BookCard
+                book={bestSeller}
+                isPurchased={purchasedBooks.includes(bestSeller.id)}
+              />
+            </div>
+          </section>
+        )}
+
         {/* Books Section */}
         <section className="container py-12">
           <Tabs defaultValue="todos" className="w-full">
             <div className="flex justify-center mb-8">
               <TabsList className="grid grid-cols-4 w-full max-w-lg">
                 <TabsTrigger value="todos">
-                  Todos ({biblicalBooks.length})
+                  Todos ({regularBooks.length})
                 </TabsTrigger>
                 <TabsTrigger value="antigo">
                   AT ({antigoTestamento.length})
@@ -107,7 +125,7 @@ export default function Index() {
 
             <TabsContent value="todos">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {biblicalBooks.map((book, index) => (
+                {regularBooks.map((book, index) => (
                   <div
                     key={book.id}
                     className="animate-fade-in"

@@ -7,9 +7,13 @@ export interface BibleBook {
   salePrice: number;
   description: string;
   coverImage: string;
+  isBestSeller?: boolean;
 }
 
 export const biblicalBooks: BibleBook[] = [
+  // Destaque - Mais Vendido
+  { id: "apocalipse", title: "Estudo de Apocalipse", slug: "apocalipse", testament: "novo", originalPrice: 14.90, salePrice: 5.00, description: "Revelações do fim dos tempos e a vitória final de Cristo.", coverImage: "/covers/apocalipse.jpg", isBestSeller: true },
+
   // Antigo Testamento
   { id: "genesis", title: "Gênesis", slug: "genesis", testament: "antigo", originalPrice: 12.90, salePrice: 5.00, description: "O livro das origens - criação, patriarcas e promessas divinas.", coverImage: "/covers/genesis.jpg" },
   { id: "proverbios", title: "Provérbios", slug: "proverbios", testament: "antigo", originalPrice: 12.90, salePrice: 5.00, description: "Sabedoria para a vida cotidiana.", coverImage: "/covers/proverbios.jpg" },
@@ -27,10 +31,12 @@ export const biblicalBooks: BibleBook[] = [
   { id: "2-tessalonicenses", title: "2 Tessalonicenses", slug: "2-tessalonicenses", testament: "novo", originalPrice: 8.90, salePrice: 5.00, description: "O dia do Senhor.", coverImage: "/covers/2-tessalonicenses.jpg" },
   { id: "1-timoteo", title: "1 Timóteo", slug: "1-timoteo", testament: "novo", originalPrice: 9.90, salePrice: 5.00, description: "Instruções para líderes.", coverImage: "/covers/1-timoteo.jpg" },
   { id: "2-timoteo", title: "2 Timóteo", slug: "2-timoteo", testament: "novo", originalPrice: 9.90, salePrice: 5.00, description: "Perseverança na fé.", coverImage: "/covers/2-timoteo.jpg" },
+  { id: "tito", title: "Tito", slug: "tito", testament: "novo", originalPrice: 8.90, salePrice: 5.00, description: "Liderança e sã doutrina na igreja.", coverImage: "/covers/tito.jpg" },
   { id: "filemom", title: "Filemom", slug: "filemom", testament: "novo", originalPrice: 7.90, salePrice: 5.00, description: "Reconciliação e perdão.", coverImage: "/covers/filemon.jpg" },
   
   // Estudos Especiais
   { id: "milagres-jesus", title: "Os Milagres de Jesus", slug: "milagres-jesus", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "Um estudo profundo sobre os milagres realizados por Jesus.", coverImage: "/covers/milagres-jesus.jpg" },
+  { id: "parabolas-jesus", title: "As Parábolas de Jesus", slug: "parabolas-jesus", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "As histórias que Jesus contou para ensinar verdades eternas.", coverImage: "/covers/parabolas-jesus.jpg" },
   { id: "ministerio-jesus", title: "O Ministério de Jesus", slug: "ministerio-jesus", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "Explore a vida e o ministério terreno de Jesus Cristo.", coverImage: "/covers/ministerio-jesus.jpg" },
   { id: "biografia-paulo", title: "Biografia de Paulo", slug: "biografia-paulo", testament: "estudo", originalPrice: 14.90, salePrice: 5.00, description: "A fascinante jornada do apóstolo Paulo.", coverImage: "/covers/biografia-paulo.jpg" },
   { id: "oracao-pai-nosso", title: "A Oração do Pai Nosso", slug: "oracao-pai-nosso", testament: "estudo", originalPrice: 12.90, salePrice: 5.00, description: "Um estudo teológico profundo sobre a oração modelo.", coverImage: "/covers/oracao-pai-nosso.jpg" },
