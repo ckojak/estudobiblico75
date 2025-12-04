@@ -121,7 +121,7 @@ serve(async (req) => {
         book_id: bookId,
         stripe_payment_intent_id: paymentIntentId,
         amount_paid: (session.amount_total || 0) / 100,
-        service_fee: 0.50,
+        service_fee: 0.93,
         status: "completed",
         completed_at: new Date().toISOString(),
       })
