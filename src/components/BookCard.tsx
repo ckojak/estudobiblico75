@@ -22,6 +22,15 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
 
   const discount = Math.round(((book.originalPrice - book.salePrice) / book.originalPrice) * 100);
 
+  const getTestamentLabel = () => {
+    switch (book.testament) {
+      case "antigo": return "Antigo Testamento";
+      case "novo": return "Novo Testamento";
+      case "estudo": return "Estudo Bíblico";
+      default: return "";
+    }
+  };
+
   const handlePurchase = async () => {
     if (!user) {
       toast({
@@ -69,12 +78,16 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
       
       <CardContent className="p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="w-20 h-28 mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-md">
-            <BookOpen className="w-8 h-8 text-primary" />
+          <div className="w-32 h-44 mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300 shadow-md">
+            <img 
+              src={book.coverImage} 
+              alt={`Capa do livro ${book.title}`}
+              className="w-full h-full object-cover"
+            />
           </div>
           
           <Badge variant="secondary" className="mb-2 text-xs">
-            {book.testament === "antigo" ? "Antigo Testamento" : "Novo Testamento"}
+            {getTestamentLabel()}
           </Badge>
           
           <h3 className="font-serif font-semibold text-lg text-foreground mb-2">
