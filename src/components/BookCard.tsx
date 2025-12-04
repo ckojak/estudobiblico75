@@ -69,15 +69,15 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
   };
 
   return (
-    <Card className={`group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg ${book.isBestSeller ? 'ring-2 ring-accent shadow-lg' : ''}`}>
+    <Card className={`group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg ${book.isBestSeller ? 'ring-2 ring-orange-400/50' : ''}`}>
       {book.isBestSeller && (
-        <Badge className="absolute top-3 left-3 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold animate-pulse">
+        <Badge className="absolute top-3 left-3 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-semibold">
           <Flame className="w-3 h-3 mr-1" />
           Mais Vendido
         </Badge>
       )}
       {discount > 0 && (
-        <Badge className="absolute top-3 right-3 z-10 bg-accent text-accent-foreground font-semibold">
+        <Badge className={`absolute top-3 ${book.isBestSeller ? 'right-3' : 'right-3'} z-10 bg-accent text-accent-foreground font-semibold`}>
           -{discount}%
         </Badge>
       )}
