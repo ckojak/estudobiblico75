@@ -1,10 +1,10 @@
 project_id = "pacwqtxbrtecrdjrbaha"
 
 [functions.create-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.verify-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-download-url]
-verify_jwt = false
+verify_jwt = true
