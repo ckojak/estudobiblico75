@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, Check, Loader2, X, Image, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +35,16 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
   const [uploaded, setUploaded] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedBookId, setSelectedBookId] = useState<string>(preselectedBookId || "");
+  const [selectedBookId, setSelectedBookId] = useState<string>("");
+
+  // Sync preselectedBookId when modal opens
+  useEffect(() => {
+    if (open && preselectedBookId) {
+      setSelectedBookId(preselectedBookId);
+    }
+  }, [open, preselectedBookId]);
+
+  const selectedBook = biblicalBooks.find(b => b.id === selectedBookId);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,9 +161,7 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
       setSelectedFile(null);
       setPreview(null);
       setUploaded(false);
-      if (!preselectedBookId) {
-        setSelectedBookId("");
-      }
+      setSelectedBookId("");
     }
     onOpenChange(newOpen);
   };
@@ -168,7 +175,10 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
             Compra via PIX
           </DialogTitle>
           <DialogDescription>
-            Selecione o livro e envie o comprovante do pagamento PIX
+            {bookTitle 
+              ? `Envie o comprovante para "${bookTitle}"`
+              : "Selecione o livro e envie o comprovante do pagamento PIX"
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -185,25 +195,34 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
             </div>
           ) : (
             <>
-              {/* Book Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Livro que deseja comprar
-                </label>
-                <Select value={selectedBookId} onValueChange={setSelectedBookId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um livro..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {biblicalBooks.map((book) => (
-                      <SelectItem key={book.id} value={book.id}>
-                        {book.title} - R$ {book.salePrice.toFixed(2)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Book Selection - only show if no preselected book */}
+              {!preselectedBookId ? (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Livro que deseja comprar
+                  </label>
+                  <Select value={selectedBookId} onValueChange={setSelectedBookId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um livro..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {biblicalBooks.map((book) => (
+                        <SelectItem key={book.id} value={book.id}>
+                          {book.title} - R$ {book.salePrice.toFixed(2)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="p-3 bg-teal-500/10 rounded-lg border border-teal-500/20">
+                  <p className="text-sm font-medium text-foreground">{bookTitle}</p>
+                  <p className="text-xs text-teal-600">
+                    R$ {selectedBook?.salePrice.toFixed(2).replace(".", ",")}
+                  </p>
+                </div>
+              )}
 
               {/* File Upload */}
               <div className="space-y-2">
