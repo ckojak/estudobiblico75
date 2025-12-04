@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BookCard } from "@/components/BookCard";
@@ -7,11 +7,40 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Sparkles, Shield, Download, Flame } from "lucide-react";
+import { BookOpen, Sparkles, Shield, Download, Quote } from "lucide-react";
+
+const versiculos = [
+  { texto: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.", referencia: "João 3:16" },
+  { texto: "O Senhor é o meu pastor; nada me faltará.", referencia: "Salmos 23:1" },
+  { texto: "Tudo posso naquele que me fortalece.", referencia: "Filipenses 4:13" },
+  { texto: "Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.", referencia: "Provérbios 3:5" },
+  { texto: "Porque eu sei os planos que tenho para vocês, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro.", referencia: "Jeremias 29:11" },
+  { texto: "Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus.", referencia: "Isaías 41:10" },
+  { texto: "E conhecereis a verdade, e a verdade vos libertará.", referencia: "João 8:32" },
+  { texto: "O amor é paciente, o amor é bondoso. Não inveja, não se vangloria, não se orgulha.", referencia: "1 Coríntios 13:4" },
+  { texto: "Buscai primeiro o Reino de Deus e a sua justiça, e todas estas coisas vos serão acrescentadas.", referencia: "Mateus 6:33" },
+  { texto: "Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.", referencia: "Salmos 37:5" },
+  { texto: "Bem-aventurados os pacificadores, porque eles serão chamados filhos de Deus.", referencia: "Mateus 5:9" },
+  { texto: "Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos!", referencia: "Filipenses 4:4" },
+  { texto: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.", referencia: "Mateus 11:28" },
+  { texto: "Eu sou o caminho, a verdade e a vida. Ninguém vem ao Pai senão por mim.", referencia: "João 14:6" },
+  { texto: "Porque pela graça sois salvos, por meio da fé; e isto não vem de vós; é dom de Deus.", referencia: "Efésios 2:8" },
+  { texto: "Sede fortes e corajosos, não temais, nem vos atemorizeis; porque o Senhor, vosso Deus, é convosco.", referencia: "Deuteronômio 31:6" },
+  { texto: "A tua palavra é lâmpada para os meus pés e luz para o meu caminho.", referencia: "Salmos 119:105" },
+  { texto: "Mas os que esperam no Senhor renovarão as suas forças; subirão com asas como águias.", referencia: "Isaías 40:31" },
+  { texto: "Não se turbe o vosso coração; credes em Deus, crede também em mim.", referencia: "João 14:1" },
+  { texto: "Pois onde estiver o vosso tesouro, aí estará também o vosso coração.", referencia: "Mateus 6:21" },
+];
 
 export default function Index() {
   const { user } = useAuth();
   const [purchasedBooks, setPurchasedBooks] = useState<string[]>([]);
+
+  // Gera um versículo aleatório a cada renderização
+  const versiculoDoDia = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * versiculos.length);
+    return versiculos[randomIndex];
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -31,11 +60,9 @@ export default function Index() {
     }
   };
 
-  const bestSeller = biblicalBooks.find((b) => b.isBestSeller);
-  const regularBooks = biblicalBooks.filter((b) => !b.isBestSeller);
-  const antigoTestamento = regularBooks.filter((b) => b.testament === "antigo");
-  const novoTestamento = regularBooks.filter((b) => b.testament === "novo");
-  const estudos = regularBooks.filter((b) => b.testament === "estudo");
+  const antigoTestamento = biblicalBooks.filter((b) => b.testament === "antigo");
+  const novoTestamento = biblicalBooks.filter((b) => b.testament === "novo");
+  const estudos = biblicalBooks.filter((b) => b.testament === "estudo");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -87,21 +114,21 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Best Seller Highlight */}
-        {bestSeller && (
-          <section className="container py-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Flame className="w-6 h-6 text-orange-500" />
-              <h2 className="text-2xl font-serif font-bold text-foreground">Mais Vendido</h2>
+        {/* Versículo do Dia */}
+        <section className="container py-8">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Quote className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">Versículo do Dia</span>
             </div>
-            <div className="max-w-sm mx-auto md:mx-0">
-              <BookCard
-                book={bestSeller}
-                isPurchased={purchasedBooks.includes(bestSeller.id)}
-              />
-            </div>
-          </section>
-        )}
+            <blockquote className="text-lg md:text-xl text-foreground/80 italic font-serif leading-relaxed">
+              "{versiculoDoDia.texto}"
+            </blockquote>
+            <cite className="block mt-3 text-sm text-muted-foreground not-italic font-medium">
+              — {versiculoDoDia.referencia}
+            </cite>
+          </div>
+        </section>
 
         {/* Books Section */}
         <section className="container py-12">
@@ -109,7 +136,7 @@ export default function Index() {
             <div className="flex justify-center mb-8">
               <TabsList className="grid grid-cols-4 w-full max-w-lg">
                 <TabsTrigger value="todos">
-                  Todos ({regularBooks.length})
+                  Todos ({biblicalBooks.length})
                 </TabsTrigger>
                 <TabsTrigger value="antigo">
                   AT ({antigoTestamento.length})
@@ -125,7 +152,7 @@ export default function Index() {
 
             <TabsContent value="todos">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {regularBooks.map((book, index) => (
+                {biblicalBooks.map((book, index) => (
                   <div
                     key={book.id}
                     className="animate-fade-in"

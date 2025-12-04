@@ -13,7 +13,7 @@ export function Footer() {
               <span className="text-xl font-serif font-semibold">Biblioteca Sagrada</span>
             </div>
             <p className="text-muted-foreground text-sm max-w-md">
-              Sua fonte confiável de e-books bíblicos. Todos os 66 livros da Bíblia 
+              Sua fonte confiável de e-books bíblicos. Materiais de estudo 
               disponíveis em formato digital para sua edificação espiritual.
             </p>
           </div>
