@@ -23,6 +23,7 @@ export default function MyPurchases() {
   const { user, loading: authLoading } = useAuth();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingBook, setDownloadingBook] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -55,12 +56,45 @@ export default function MyPurchases() {
     setLoading(false);
   };
 
-  const handleDownload = (bookId: string) => {
-    // In a real app, this would download from Supabase Storage
-    toast({
-      title: "Download iniciado",
-      description: "O PDF será baixado em instantes. (Demonstração)",
-    });
+  const handleDownload = async (bookId: string, bookTitle: string) => {
+    setDownloadingBook(bookId);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("get-download-url", {
+        body: { bookId },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Erro ao obter link de download");
+      }
+
+      if (data?.url) {
+        // Open the signed URL in a new tab to trigger download
+        const link = document.createElement("a");
+        link.href = data.url;
+        link.download = `${bookTitle}.pdf`;
+        link.target = "_blank";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "Download iniciado",
+          description: `O PDF de "${bookTitle}" está sendo baixado.`,
+        });
+      } else {
+        throw new Error(data?.error || "Link de download não disponível");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Erro no download",
+        description: error instanceof Error ? error.message : "Não foi possível baixar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingBook(null);
+    }
   };
 
   if (authLoading || loading) {
@@ -149,11 +183,16 @@ export default function MyPurchases() {
                         </div>
 
                         <Button 
-                          onClick={() => handleDownload(book.id)}
+                          onClick={() => handleDownload(book.id, book.title)}
                           className="flex-shrink-0"
+                          disabled={downloadingBook === book.id}
                         >
-                          <Download className="w-4 h-4 mr-2" />
-                          Baixar PDF
+                          {downloadingBook === book.id ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4 mr-2" />
+                          )}
+                          {downloadingBook === book.id ? "Baixando..." : "Baixar PDF"}
                         </Button>
                       </div>
                     </CardContent>
