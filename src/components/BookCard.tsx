@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, ShoppingCart, Flame } from "lucide-react";
+import { BookOpen, ShoppingCart, Flame, MessageCircle } from "lucide-react";
 import type { BibleBook } from "@/data/biblicalBooks";
 import PixReceiptUpload from "./PixReceiptUpload";
+
+const WHATSAPP_NUMBER = "5521965106389";
 
 interface BookCardProps {
   book: BibleBook;
@@ -42,6 +44,13 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
     }
 
     setShowPixModal(true);
+  };
+
+  const getWhatsAppUrl = () => {
+    const message = encodeURIComponent(
+      `Olá! Gostaria de comprar o livro "${book.title}" via Pix. Por favor, me envie a chave. Enviarei o comprovante em seguida para receber o link de acesso.`
+    );
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
   };
 
   return (
@@ -98,13 +107,25 @@ export function BookCard({ book, isPurchased }: BookCardProps) {
                 </a>
               </Button>
             ) : (
-              <Button 
-                onClick={handlePurchase} 
-                className="w-full bg-teal-500 hover:bg-teal-600"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Comprar via PIX
-              </Button>
+              <div className="w-full space-y-2">
+                <Button 
+                  onClick={handlePurchase} 
+                  className="w-full bg-teal-500 hover:bg-teal-600"
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Comprar via PIX
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                  asChild
+                >
+                  <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Pix via WhatsApp
+                  </a>
+                </Button>
+              </div>
             )}
           </div>
         </CardContent>

@@ -59,7 +59,6 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Fetch book price from database (prevents price manipulation)
-    // Try to find by UUID first, then by slug
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -98,11 +97,20 @@ serve(async (req) => {
       });
     }
     
-    const actualBookId = book.id; // Use the UUID from database
+    const actualBookId = book.id;
     const amount = book.sale_price;
     logStep("Book price fetched from database", { bookId: actualBookId, amount });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not configured");
+      return new Response(JSON.stringify({ error: "Payment system not configured" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
@@ -115,17 +123,19 @@ serve(async (req) => {
     }
 
     // Total amount including service fee (R$ 0.93)
-    const totalAmount = Math.round((amount + 0.93) * 100); // Convert to cents
-    logStep("Calculated total", { baseAmount: amount, serviceFee: 0.93, totalCents: totalAmount });
+    const serviceFee = 0.93;
+    const totalAmount = Math.round((amount + serviceFee) * 100); // Convert to cents
+    logStep("Calculated total", { baseAmount: amount, serviceFee, totalCents: totalAmount });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      payment_method_types: ['card'],
+      // Enable automatic payment methods - accepts PIX, Boleto, Cards based on Stripe dashboard config
+      payment_method_types: undefined, // Let Stripe decide based on automatic_payment_methods
       line_items: [
         {
           price_data: {
-            currency: "brl",
+            currency: "brl", // Force BRL (Reais)
             product_data: {
               name: book.title || bookTitle,
               description: `E-book Bíblico - ${book.title || bookTitle}`,
@@ -136,12 +146,25 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
+      // Enable automatic payment methods for PIX/Boleto support
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic',
+        },
+      },
       success_url: `${req.headers.get("origin")}/sucesso?session_id={CHECKOUT_SESSION_ID}&book_id=${actualBookId}`,
       cancel_url: `${req.headers.get("origin")}/`,
       metadata: {
         bookId: actualBookId,
         userId: user.id,
-        serviceFee: "0.50",
+        serviceFee: serviceFee.toString(),
+      },
+      // For async payment methods (PIX/Boleto), wait for completion
+      payment_intent_data: {
+        metadata: {
+          bookId: actualBookId,
+          userId: user.id,
+        },
       },
     });
 
