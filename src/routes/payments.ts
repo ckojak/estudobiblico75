@@ -4,13 +4,13 @@ const router = Router();
 
 /**
  * Endpoint simplificado para registrar pagamento via PIX com envio de comprovante por WhatsApp.
- * Remove o upload direto de arquivos do servidor.
+ * Não aceita arquivos. Ajuste para integrar ao seu serviço/ORM.
  */
 router.post("/payments/pix", async (req: Request, res: Response) => {
   try {
     const { userId, amount, viaWhatsapp } = req.body;
-    // Exemplo: salvar apenas a intenção/registro (implemente conforme seu service/ORM)
-    // await paymentsService.create({ userId, amount, method: 'pix-whatsapp', viaWhatsapp });
+    // TODO: integrar com paymentsService/DB para registrar a intenção de pagamento
+    // Exemplo: await paymentsService.create({ userId, amount, method: 'pix-whatsapp', viaWhatsapp: !!viaWhatsapp });
 
     return res.status(201).json({ message: "Pagamento registrado (aguardando comprovante por WhatsApp)" });
   } catch (err) {
