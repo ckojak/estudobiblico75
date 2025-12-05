@@ -1,4 +1,3 @@
-```markdown
 # Pagamentos
 
 A partir de agora, o site NÃO aceita mais upload de comprovante diretamente pelo site.
@@ -12,5 +11,4 @@ Fluxo atualizado:
 Observação:
 
 - Arquivos de comprovantes não serão mais aceitos pelo site. Adicionamos um script em scripts/cleanup-comprovantes.ts para ajudar a remover arquivos já armazenados no servidor. Faça backup antes de executar.
-- Se houver comprovantes armazenados no histórico do Git (commits anteriores), será necessário reescrever o histórico com ferramentas como git filter-repo ou BFG (aqui não aplicaremos essa reescrita automaticamente).
-```
+- Se houver comprovantes armazenados no histórico do Git (commits anteriores), será necessário reescrever o histórico com ferramentas como git filter-repo ou BFG (essa operação reescreve commits e requer coordenação com colaboradores).
