@@ -97,10 +97,25 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
     setUploading(true);
 
     try {
-      // Get book details
-      const book = biblicalBooks.find(b => b.id === selectedBookId);
-      if (!book) {
+      // Get book details from local data
+      const localBook = biblicalBooks.find(b => b.id === selectedBookId);
+      if (!localBook) {
         throw new Error("Livro não encontrado");
+      }
+
+      // Fetch the actual book UUID from database using slug
+      const { data: dbBook, error: bookError } = await supabase
+        .from('books')
+        .select('id, sale_price')
+        .eq('slug', selectedBookId)
+        .maybeSingle();
+
+      if (bookError) {
+        throw new Error("Erro ao buscar livro no banco de dados");
+      }
+
+      if (!dbBook) {
+        throw new Error("Livro não encontrado no banco de dados. Contate o administrador.");
       }
 
       // Upload receipt to storage
@@ -115,13 +130,13 @@ const PixReceiptUpload = ({ open, onOpenChange, preselectedBookId, bookTitle }: 
         throw uploadError;
       }
 
-      // Create pending purchase
+      // Create pending purchase with correct UUID
       const { error: purchaseError } = await supabase
         .from('purchases')
         .insert({
           user_id: user.id,
-          book_id: selectedBookId,
-          amount_paid: book.salePrice,
+          book_id: dbBook.id,
+          amount_paid: dbBook.sale_price,
           service_fee: 0,
           status: 'pending',
           pix_receipt_url: fileName
