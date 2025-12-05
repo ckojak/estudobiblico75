@@ -130,12 +130,10 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      // Enable automatic payment methods - accepts PIX, Boleto, Cards based on Stripe dashboard config
-      payment_method_types: undefined, // Let Stripe decide based on automatic_payment_methods
       line_items: [
         {
           price_data: {
-            currency: "brl", // Force BRL (Reais)
+            currency: "brl",
             product_data: {
               name: book.title || bookTitle,
               description: `E-book Bíblico - ${book.title || bookTitle}`,
@@ -146,11 +144,10 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      // Enable automatic payment methods for PIX/Boleto support
-      payment_method_options: {
-        card: {
-          request_three_d_secure: 'automatic',
-        },
+      // Enable automatic payment methods - accepts all methods enabled in Stripe Dashboard
+      // This includes: Cards, PIX, Boleto, Google Pay, Apple Pay, etc.
+      automatic_payment_methods: {
+        enabled: true,
       },
       success_url: `${req.headers.get("origin")}/sucesso?session_id={CHECKOUT_SESSION_ID}&book_id=${actualBookId}`,
       cancel_url: `${req.headers.get("origin")}/`,
@@ -159,7 +156,6 @@ serve(async (req) => {
         userId: user.id,
         serviceFee: serviceFee.toString(),
       },
-      // For async payment methods (PIX/Boleto), wait for completion
       payment_intent_data: {
         metadata: {
           bookId: actualBookId,
