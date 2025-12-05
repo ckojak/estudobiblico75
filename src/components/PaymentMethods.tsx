@@ -1,10 +1,14 @@
-import { Shield, Lock, Copy, Check, Upload } from "lucide-react";
+import { Shield, Lock, Copy, Check, Upload, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import pixQrCode from "@/assets/pix-qrcode.jpeg";
 import PixReceiptUpload from "./PixReceiptUpload";
 
 const PIX_CODE = "00020126580014BR.GOV.BCB.PIX01368b362a40-2c30-4453-921c-d318db20116852040000530398654045.935802BR5924Carlos Henrique da Costa6009SAO PAULO62140510zdxnN49Kap6304A896";
+
+const WHATSAPP_NUMBER = "5521965106389";
+const WHATSAPP_MESSAGE = encodeURIComponent("Olá! Gostaria de comprar o livro via Pix. Por favor, me envie a chave. Enviarei o comprovante em seguida para receber o link de acesso.");
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
 const PaymentMethods = () => {
   const [copied, setCopied] = useState(false);
@@ -86,8 +90,8 @@ const PaymentMethods = () => {
                     )}
                   </button>
                 </div>
-                <div className="mt-4 pt-4 border-t border-border/30">
-                  <p className="text-xs text-muted-foreground mb-3">
+                <div className="mt-4 pt-4 border-t border-border/30 space-y-3">
+                  <p className="text-xs text-muted-foreground">
                     Após o pagamento, envie o comprovante para liberar seu e-book:
                   </p>
                   <button
@@ -97,6 +101,26 @@ const PaymentMethods = () => {
                     <Upload className="w-4 h-4" />
                     Enviar Comprovante
                   </button>
+                  
+                  {/* WhatsApp Alternative */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-border/30"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="px-2 bg-card text-muted-foreground">ou</span>
+                    </div>
+                  </div>
+                  
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Pagar via Pix (Falar no WhatsApp)
+                  </a>
                 </div>
               </div>
             </div>
