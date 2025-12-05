@@ -1,19 +1,29 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { componentTagger } from "lovable-tagger"; // Mantendo a tagger
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+// O seu projeto usa a forma de função para obter o 'mode'
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [
+    react(), 
+    mode === "development" && componentTagger() // Mantendo a tagger em dev
+  ].filter(Boolean),
+
   resolve: {
     alias: {
-      // Configuração para resolver o '@/' (caminhos absolutos)
-      "@": "/src",
+      // Unifica as configurações de alias para '@/'
+      "@": path.resolve(__dirname, "./src"),
     },
   },
-  
-  // CORREÇÃO: Aumenta o limite de tamanho do arquivo final (chunk)
+
+  // CORREÇÃO DE PERFORMANCE: Adiciona o limite de chunk size
   build: {
-    // O padrão é 500kB. Aumentamos para 1000kB (1MB) para acomodar os gráficos e o Admin.
+    // Define o limite de chunk size para 1MB (1000KB)
     chunkSizeWarningLimit: 1000, 
   },
-});
+}));
